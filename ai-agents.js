@@ -47,10 +47,16 @@ const analyzeGoal = async () => {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "stepfun/step-3.5-flash:free",
+      model: "gpt-4o-mini",
       messages: [
+        { role: "system", content: "You're are an expert personal productivity coach and learning specialist" },
         { role: "user", content: userPrompt }
       ],
+      // 0 - 0.2 -> Very deterministic; the model tends to give nearly the same answer for the same question.
+      // 0.3 - 0.6 -> Balanced between consistency and creativity.
+      // 0.7 - 1 -> More creative and varied responses.
+      // 1+ -> Highly random and unpredictable outputs.
+      temperature: 0.7
     })
 
     console.log(completion.choices[0].message.content)
