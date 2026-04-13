@@ -17,10 +17,7 @@ async function main() {
   console.log(completion.choices[0].message)
 }
 
-const analyzeGoal = async () => {
-  const goalText = "Learn python";
-  const durationDays = "7";
-
+const analyzeGoal = async (goalText, durationDays) => {
   const userPrompt = `
   User wants to ${goalText} within ${durationDays} days.
   Create a structured learning/execution plan with:
@@ -59,10 +56,15 @@ const analyzeGoal = async () => {
       temperature: 0.7
     })
 
-    console.log(completion.choices[0].message.content)
+    const content = completion.choices[0].message.content;
+    const JSONMatched = content.match(/\{[\s\S]*\}/);
+
+    return JSON.parse(JSONMatched);
   } catch (error) {
     console.log(error)
   }
 }
 
-analyzeGoal();
+module.exports = {
+  analyzeGoal
+}
