@@ -48,6 +48,26 @@ app.post("/api/goals", async (req, res) => {
     }
 })
 
+app.post("/api/goals/:goalId/evaluate", async(req, res) => {
+    try {
+        const goal = storage.getGoal(req.params.goalId);
+
+        if(!goal) {
+            return res.status(404).json({
+                error: "Goal not found!"
+            });
+        }
+
+        const task = storage.getTasksByGoal(goal.id);
+        const completedCount = tasks.filter(t => t.completed).length;
+        const started = Math.ceil((Date.now() - new Date(goal.createdAt)) / (1000 * 60 * 60 * 24));
+
+        
+    } catch (error) {
+        console.log(error);
+    }
+})
+
 // ============ SERVER START ============
 
 app.listen(PORT, () => {
