@@ -65,6 +65,27 @@ const analyzeGoal = async (goalText, durationDays) => {
   }
 }
 
+const evaluateProgress = async(goal, completedTasks, totalTasks, days) => {
+  const completionRate = ((completedTasks / totalTasks) * 100).toFixed(2);
+  const expectedRate = ((days / goal.durationDays) * 100).toFixed(2);
+  const onTrack = completionRate >= expectedRate - 10;
+
+  const prompt = `
+  Learning Goal: "${goal.title}"
+  Duration: "${goal.durationDays} days"
+  Days Elapsed: ${days} days
+  Task Completion Rate: ${completionRate}
+  Expected task completion rate: ${expectedRate}
+  Status: ${onTrack ? "ON TRACK" : "BEHIND"}
+  
+  Generate:
+  1. Performance Analysis
+  2. Specific Encouragement
+  3. Recommend Next Action (just 1-3 lines)
+  4. Weekly Tips
+  `
+}
+
 module.exports = {
   analyzeGoal
 }
