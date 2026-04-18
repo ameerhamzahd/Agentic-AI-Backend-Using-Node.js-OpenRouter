@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { analyzeGoal } = require('./ai-agents');
+const { analyzeGoal, evaluateProgress } = require('./ai-agents');
 const storage = require('./storage');
 
 const app = express();
@@ -58,11 +58,13 @@ app.post("/api/goals/:goalId/evaluate", async(req, res) => {
             });
         }
 
-        const task = storage.getTasksByGoal(goal.id);
+        const tasks = storage.getTasksByGoal(goal.id);
         const completedCount = tasks.filter(t => t.completed).length;
         const started = Math.ceil((Date.now() - new Date(goal.createdAt)) / (1000 * 60 * 60 * 24));
 
-        
+        const evaluation = await evaluateProgress(goal, completedCount, tasks.length, started);
+
+        res.json(evaluation);
     } catch (error) {
         console.log(error);
     }

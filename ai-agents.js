@@ -8,7 +8,7 @@ const openai = new OpenAI({
 
 async function main() {
   const completion = await openai.chat.completions.create({
-    model: "stepfun/step-3.5-flash:free",
+    model: "gpt-4o-mini",
     messages: [
       { role: "user", content: "What is Agentic AI?" }
     ],
@@ -65,7 +65,7 @@ const analyzeGoal = async (goalText, durationDays) => {
   }
 }
 
-const evaluateProgress = async(goal, completedTasks, totalTasks, days) => {
+const evaluateProgress = async (goal, completedTasks, totalTasks, days) => {
   const completionRate = ((completedTasks / totalTasks) * 100).toFixed(2);
   const expectedRate = ((days / goal.durationDays) * 100).toFixed(2);
   const onTrack = completionRate >= expectedRate - 10;
@@ -83,9 +83,36 @@ const evaluateProgress = async(goal, completedTasks, totalTasks, days) => {
   2. Specific Encouragement
   3. Recommend Next Action (just 1-3 lines)
   4. Weekly Tips
+
+  Return as JSON:
+  {
+    "analysis": "...",
+    "encouragement": "...",
+    "nextAction": "...",
+    "tip": "..."
+  }
   `
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "You're a supportive & smart productivity coach. Be encouraging but honest. Adapt your tone based on progress." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.8
+    })
+
+    const content = response.choices[0].message.content;
+    const JSONMatched = content.match(/\{[\s\S]*\}/);
+
+    return JSON.parse(JSONMatched);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 module.exports = {
-  analyzeGoal
+  analyzeGoal,
+  evaluateProgress
 }
